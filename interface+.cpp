@@ -7,7 +7,8 @@ using namespace std;
 /*
 bugs created:
 pressing enter on blank input results to an error
-inputting the variable only results to an error
+inputting the variable/keyword only results to an error
+
 
 
 summary of functions made
@@ -25,6 +26,9 @@ vector<string> processInput - accepts string input from user, returns vector wit
 bool isUsed - returns true if the string is a variable name that does not exist
 void variable_history - updates the masterlist of all variables inputted by the user
 void semantics - processes the intent and works through the commands of the user
+int string_size - accepts a string input, returns its size (for non const strings)
+string evaluate - replaces all variables with their corresponding values for easier solving
+string concatenate - given a starting point, combines all desparate strings from vector into 1
 
 */
 
@@ -71,11 +75,7 @@ bool isUsed(vector<variables> var_list, string input){
 	int valid = true;
 	
 	while(i < var_list.size()){
-	cout<<"value of i:"<<i<<"\t"<<"Value of size: "<<var_list.size()<<endl;
-	cout<<var_list[i].name<<"\t"<<input<<endl;
-	
 		if(var_list[i].name == input){
-			cout<<"same"<<endl;
 			return false;
 		}		
 		i++;
@@ -234,23 +234,22 @@ vector<string> processInput(string input) {                                     
 
 
 void variable_history(vector<variables> &var_list, vector <string> &user_command){
-	if(!isUsed(var_list, user_command[0]) || isKeyword(user_command[0])) return;
+	if(user_command[0]== "BEG" && !isUsed(var_list, user_command[1])){			//for cases of beg which is an elaborate assignment operator, exceptions are made
+		var_list.push_back(variables());
+		var_list.at(var_list.size()-1).name = user_command.at(1);
+	}
+	
+	if(!isUsed(var_list, user_command[0]) || isKeyword(user_command[0])) return;	//to prevent submitting keywords as variables as well as variable resubmission 
+	
 
-	//if first element is variable put into variable vector since there can only be 1 l-value in an assignment
-	if(user_command.at(0) != "" && isValid(user_command.at(0))){
+	if(user_command.at(0) != "" && isValid(user_command.at(0))){  					//if first element is variable, save it to the masterlist, assume its an assignment statement
 		var_list.push_back(variables());
 		var_list.at(var_list.size()-1).name = user_command.at(0);
 	}
-	
-	for(int i=0; i<var_list.size();i++){
-		cout<<i<<":"<<var_list[i].name<<endl;
-	}
-
-
 
 }
 
-int string_size(string input){
+int string_size(string input){														//string size
 	int i;
 	
 	for(i=0; input[i] != '\0';) i++;
@@ -259,30 +258,28 @@ int string_size(string input){
 }
 
 
-string evaluate(string &input, vector <variables> &var_list){cout<<"evaluate:\t"<<input<<endl;
+string evaluate(string &input, vector <variables> &var_list){						//replaces all variables with their corresponding values for easier solving
 	int i=0,j=1;
 	
-	while(i < j){cout<<input<<endl;
+	while(i < j){
 		j=string_size(input);
 			
 				
 		if(!isdigit(input[i]) && !isOperator(input[i])){											//if it is not a digit and not an operator
 			//check for Mod
-			std::size_t found = input.find("MOD"); 
+			std::size_t found = input.find("MOD"); 													//made specifically for MOD keyword, replace it with %
 			if(found != std::string::npos){
 				input.replace(found, found+2, "%");
 				continue;
 			}
 			
-			//find and replace all present variables in the string
 			int k=0;
-			while(k < var_list.size()){
+			while(k < var_list.size()){																//find and replace all present variables in the string
 				string check = var_list.at(k).name;
 				
 				
 				found = input.find(check);
 				if(found != std::string::npos){
-					
 					input.replace(found, found + string_size(check), var_list.at(k).value);
 					continue;
 				}
@@ -296,7 +293,7 @@ string evaluate(string &input, vector <variables> &var_list){cout<<"evaluate:\t"
 	return input;
 }
 
-string concatenate(vector<string> user_command, int starting_point){
+string concatenate(vector<string> user_command, int starting_point){							//	 given a starting point, combines all desparate strings from vector into 1 string
 	int j = starting_point;
 	string input ="";
 		for(j; j< user_command.size(); j++){
@@ -308,14 +305,13 @@ string concatenate(vector<string> user_command, int starting_point){
 		
 
 
-void semantics(vector <variables> &var_list, vector <string> &user_command){									//due to nature of switch only accepting int and does not handle string well, if are used throughout
-	//check if assignment,
-	if(!isUsed(var_list, user_command[0]) && user_command.at(1) == "="){							//if the 1st input is a variable and the second is an equal sign
+void semantics(vector <variables> &var_list, vector <string> &user_command){					//due to nature of switch only accepting int and does not handle string well, if are used throughout
+
+	if(!isUsed(var_list, user_command[0]) && user_command.at(1) == "="){						//check if assignment, variable in first element, '=' on the second
 		int i=0;
-		//search for the variable specified
-		while(i < var_list.size()){
-			cout<<"check"<<endl;
-			if(var_list[i].name == user_command[0]) {
+	
+		while(i < var_list.size()){																//search for the variable specified
+			if(var_list[i].name == user_command[0]) {											//once found, concatenate the rest into 1 r-value, evaluates it and assigns it to var
 				string input = concatenate(user_command, 2);
 				var_list[i].value = evaluate(input, var_list);
 				break;	
@@ -327,18 +323,27 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 	else if(isKeyword(user_command[0])){
 	
 		if(user_command[0] == "PRINT"){
-			cout<<"Printing"<<endl;
 			
 			string input = concatenate(user_command, 1);
 			input = evaluate(input, var_list);
 			cout<<input;			
-			cout<<"check"<<endl;
-		
-		
-			cout << input<<endl;
 		}
 		
-		
+		else if(user_command[0] == "BEG"){ cout<<"entering beg"<<endl;
+			int i=0;
+			string input;
+
+			while(i < var_list.size()){
+				if(var_list[i].name == user_command[1]) {
+					cout<<"Please enter value for ["<<user_command[1]<<"]"<<endl<<"Input:";
+					cin>>input;
+					var_list[i].value= evaluate(input, var_list);
+					fflush(stdin);
+					break;
+				}
+				i++;
+			}			
+		}		
 	}
 	//if not an assignment nor a keyword, assume an arithmetic
 	else{
@@ -366,7 +371,6 @@ int main() {
 
         
         variable_history(var_list, user_command);
-        
         semantics(var_list, user_command);       
         
         
