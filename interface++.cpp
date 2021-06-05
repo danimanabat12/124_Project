@@ -327,7 +327,7 @@ vector<string> processInput(string input) {                                     
 }
 
 void variable_history(vector<variables> &var_list, vector <string> &user_command){
-	if(user_command[0]== "BEG" && !isUsed(var_list, user_command[1])){			//for cases of beg which is an elaborate assignment operator, exceptions are made
+	if(user_command[0]== "BEG" && isUsed(var_list, user_command[1])){			//for cases of beg which is an elaborate assignment operator, exceptions are made
 		var_list.push_back(variables());
 		var_list.at(var_list.size()-1).name = user_command.at(1);
 	}
@@ -404,7 +404,7 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 				else var_list[i].type = "Int";
 				
 				
-				cout<<"datatype of "<<var_list[i].value<<" is "<<var_list[i].type<<endl;
+				cout<<"datatype of "<<var_list[i].name<<" is "<<var_list[i].type<<endl;
 				break;	
 			}
 			i++;
@@ -415,7 +415,8 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 		if(user_command[0] == "PRINT"){
 			string input = concatenate(user_command, 1);
 			input = evaluate(input, var_list);
-			cout<<input;			
+			//evaluate arithmetic here
+			cout<<input<<endl;
 		}
 		
 		else if(user_command[0] == "BEG"){ 
