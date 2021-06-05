@@ -349,7 +349,7 @@ vector<string> processInput(string input) {                                     
             }
             else if (input[i] == '=') {                                                                    //check if the current character is an equal sign
                 if (placeholder != "") {  
-						if (characterError == true) {
+					if (characterError == true) {
 						cout << "SNOL> Unknown word [" << placeholder <<"]" << endl; 
                     	user_command.clear();
                     	return user_command;
@@ -384,7 +384,8 @@ vector<string> processInput(string input) {                                     
                 }  
                 else if (isalnum(input[i])) {
                     placeholder += input[i];
-                }                                                      
+                }
+				else if (input[i] == '\0') {}  															//Ignore the string terminator character.                                                   
                 else {
                 	characterError = true; 
         			placeholder += input[i];
