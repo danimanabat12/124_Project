@@ -449,8 +449,10 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 	string dataType; 
 	string var_name = "";
 	bool encounteredEqual = false; 
+	bool encounteredOperator = false;
 	bool containsFloat = false; 
 	bool undefinedVars = false; 
+	
 	
 	vector<string> undefined; 
 	vector<string> varDataTypes; 
@@ -487,7 +489,7 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 				}
 				
 				else {
-					
+					if (isOperator) encounteredOperator = true;
 					if(!isOperand(bin) && bin != "") {
 						cout << "SNOL> [" << bin << "] is not a valid integer nor float!" << endl; 
 						return false;
@@ -537,9 +539,9 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 		for (int i = 0; i < varDataTypes.size() - 1; i++) {
 			string str1 = varDataTypes.at(i);
 			string str2 = varDataTypes.at(i+1);
-//			cout << str1 << " and " << str2 << endl;
+			cout << str1 << " and " << str2 << endl;
 			if(str1 != str2) {
-				if (!(encounteredEqual == true && user_command.size() == 3)) {
+				if (!(encounteredEqual == true && user_command.size() == 3 && encounteredOperator == false)) {
 					cout << "SNOL> Error! Operands must be of the same type in an arithmetic operation!" << endl;
 					return false;
 				} 
