@@ -5,6 +5,35 @@
 #include<string>
 #include<sstream>
 
+/*
+bugs created:
+pressing enter on blank input results to an error
+inputting the variable/keyword only results to an error
+
+
+
+summary of functions made
+
+book isKeyword - returns true if the string is a keyword(BEG, PRINT, MOD)
+bool isValid - returns true if the string satisfies variable name req.
+bool isInteger - returns true if the string is an integer
+bool isFloat -returns true if the string is a float
+bool isOperator - returns true if the char is an operator symbol
+
+bool containsNoChar - returns true if there is no alphabet in the string
+vector<string> processInput - accepts string input from user, returns vector with the inputs separated according to their 'tokens'
+
+
+bool isUsed - returns true if the string is a variable name that does not exist
+void variable_history - updates the masterlist of all variables inputted by the user
+void semantics - processes the intent and works through the commands of the user
+int string_size - accepts a string input, returns its size (for non const strings)
+string evaluate - replaces all variables with their corresponding values for easier solving
+string concatenate - given a starting point, combines all desparate strings from vector into 1
+
+*/
+
+
 using namespace std;
 
 typedef struct variables {                                                                          //typedef struct for the variables 
@@ -275,7 +304,7 @@ vector<string> processInput(string input) {                                     
 
     while (i < input.length()) {                                                                      //runs until the length of user command string
 
-        if (isalnum(input[i]) || input[i] == '.') {                                                   //checks if the current character is alphanumeric or a dot
+        if (isalnum(input[i]) || input[i] == '.' || input[i] == '(' || input[i] == ')') {                                                   //checks if the current character is alphanumeric or a dot
             if (isOperator(placeholder[placeholder.size()-1])) {                                        //if yes, it firstly checks if the last character on the placeholder string is an operator   
                 if(isdigit(input[i])) {                                                                 //if the upper if-statement is evaluated, it checks if the current char is a digit
                     placeholder += input[i];                                                              //if the current char is digit, it concatenates the digit to the placeholder string
@@ -382,7 +411,7 @@ vector<string> processInput(string input) {                                     
                     }
                     placeholder += input[i]; 
                 }  
-                else if (isalnum(input[i])) {
+                else if (isalnum(input[i]) || input[i] == '(' || input[i] == ')' ) {
                     placeholder += input[i];
                 }
 				else if (input[i] == '\0') {}  															//Ignore the string terminator character.                                                   
@@ -403,11 +432,11 @@ vector<string> processInput(string input) {                                     
         user_command.push_back(placeholder);
         placeholder = "";
     }
-//    cout << "debug:" << endl; 
-//    
-//    for (int i = 0; i < user_command.size(); i++) {
-//    	cout << i <<": " << user_command.at(i) << endl;
-//	}
+    cout << "debug:" << endl; 
+    
+    for (int i = 0; i < user_command.size(); i++) {
+    	cout << i <<": " << user_command.at(i) << endl;
+	}
 
     return user_command;
 }
@@ -510,8 +539,10 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 			string str2 = varDataTypes.at(i+1);
 //			cout << str1 << " and " << str2 << endl;
 			if(str1 != str2) {
-				cout << "SNOL> Error! Operands must be of the same type in an arithmetic operation!" << endl;
-				return false;
+				if (!(encounteredEqual == true && user_command.size() == 3)) {
+					cout << "SNOL> Error! Operands must be of the same type in an arithmetic operation!" << endl;
+					return false;
+				} 
 			}
 		}
 	} 
