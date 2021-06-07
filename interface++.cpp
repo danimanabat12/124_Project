@@ -583,7 +583,7 @@ string evaluate(string &input, vector <variables> &var_list){						//replaces al
 			//check for Mod
 			std::size_t found = input.find("MOD"); 													//made specifically for MOD keyword, replace it with %
 			if(found != std::string::npos){
-				input.replace(found, found+2, "%");
+				input.replace(found, string_size("MOD"), "%");
 				continue;
 			}
 			int k=0;
@@ -592,7 +592,7 @@ string evaluate(string &input, vector <variables> &var_list){						//replaces al
 				string check = var_list.at(k).name;	
 				found = input.find(check);
 				if(found != std::string::npos){
-					input.replace(found, found + string_size(check), var_list.at(k).value);
+					input.replace(found, string_size(check), var_list.at(k).value);
 					continue;
 				}
 				k++;
