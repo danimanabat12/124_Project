@@ -418,7 +418,7 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 				
 				
 				cout<<"datatype of "<<var_list[i].name<<" is "<<var_list[i].type<<endl;
-				cout << var_list[i].value << endl; 
+				cout<<"Post arithmetic: "<<	var_list[i].value<<endl;
 				break;	
 			}
 			i++;
@@ -429,7 +429,7 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 		if(user_command[0] == "PRINT"){
 			string input = concatenate(user_command, 1);
 			input = evaluate(input, var_list);
-			//evaluate arithmetic here
+
 			cout<<input<<endl;
 		}
 		
@@ -444,7 +444,7 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 					
 					//place arithmetic function here
 					var_list[i].value = arithmetic(evaluate(input, var_list));
-					cout<<var_list[i].value<<endl;
+					cout<<"Post arithmetic: "<<	var_list[i].value<<endl;
 					
 					if(!isInteger(var_list[i].value))var_list[i].type = "Float";					//determine if data type is float or integer
 					else var_list[i].type = "Int";
@@ -459,7 +459,8 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 	}
 	//if not an assignment nor a keyword, assume an arithmetic
 	else{
-		arithmetic(evaluate(user_command[0], var_list));
+		string temp = arithmetic(evaluate(user_command[0], var_list));
+		cout<<"Post arithmetic: "<<temp<<endl;
 		//place arithmetic function here
 	}
 }
