@@ -327,36 +327,72 @@ int string_size(string input){														//string size
 	return i;
 }
 
+
+int search(string &input, string &varname ){
+	int size = string_size(input);	
+	for(int i=0; i < size;i++){ 
+		string holder = "";
+		
+		//concatenate until an operator is found
+		while(1){
+			holder=holder + input[i];
+			i++;
+			if(i == size|| isOperator(input[i])){ cout<<input[i]<<endl;
+				break;
+			}
+		}
+		
+
+		std::size_t found = holder.find(varname); //checks if the 2 strings (i.e. the inputted variable and the actual variable are the same)
+		
+		
+		if(found !=std::string::npos){ //returns subscript of the start of the variable of the string
+			return i-string_size(holder);
+		}	
+	}	
+	return -1; //returns -1 if none found
+}
+
+
 string evaluate(string &input, vector <variables> &var_list){						//replaces all variables with their corresponding values for easier solving
 	int i=0,j=1;
-
+	
+	cout<<input<<endl;
 	while(i < j){
+
 		j=string_size(input);			
 		if(!isdigit(input[i]) && !isOperator(input[i])){											//if it is not a digit and not an operator
 			//check for Mod
-			std::size_t found = input.find("MOD"); 													//made specifically for MOD keyword, replace it with %
-			if(found != std::string::npos){
-				input.replace(found, string_size("MOD"), "%");
+			string mod = "MOD";
+			int found = search(input, mod);													//made specifically for MOD keyword, replace it with %
+			if(found != -1){
+				input.replace(found, found+2, "%");
 				continue;
 			}
-			int k=0;
-
+			
+			int k=0, l=0;
 			while(k < var_list.size()){																//find and replace all present variables in the string
-				string check = var_list.at(k).name;	
-				found = input.find(check);
-				if(found != std::string::npos){
-					input.replace(found, string_size(check), var_list.at(k).value);
-					continue;
+				//check if current variable is present on the input string
+								
+				int found = search(input, var_list[k].name);
+			
+				if(found != -1){
+					 
+					input.replace(found, string_size(var_list[k].name), var_list[k].value);
+					cout<<input<<endl;
+				}else{
+					k++;
 				}
-				k++;
+				
 			}			
 		}
 		i++;
 	}
 	
-	cout<<"post eval:"<<input<<endl;
+	cout<<endl<<"post eval:"<<input<<endl;
 	return input;
 }
+
 
 string concatenate(vector<string> user_command, int starting_point){							//	 given a starting point, combines all desparate strings from vector into 1 string
 	int j = starting_point;
