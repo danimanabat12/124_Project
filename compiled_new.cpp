@@ -343,12 +343,10 @@ int search(string &input, string &varname ){
 		}
 		
 
-		std::size_t found = holder.find(varname); //checks if the 2 strings (i.e. the inputted variable and the actual variable are the same)
-		
-		
-		if(found !=std::string::npos){ //returns subscript of the start of the variable of the string
+		if(holder == varname){		//if equal return the subscript (the adress of the first char of the variable to be replaced)
 			return i-string_size(holder);
-		}	
+		}
+	
 	}	
 	return -1; //returns -1 if none found
 }
@@ -389,7 +387,7 @@ string evaluate(string &input, vector <variables> &var_list){						//replaces al
 		i++;
 	}
 	
-	cout<<endl<<"post eval:"<<input<<endl;
+	cout<<"post eval:"<<input<<endl;
 	return input;
 }
 
@@ -446,7 +444,7 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 					
 					//place arithmetic function here
 					var_list[i].value = arithmetic(evaluate(input, var_list));
-					cout<<input<<endl;
+					cout<<var_list[i].value<<endl;
 					
 					if(!isInteger(var_list[i].value))var_list[i].type = "Float";					//determine if data type is float or integer
 					else var_list[i].type = "Int";
