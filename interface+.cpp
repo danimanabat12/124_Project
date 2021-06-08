@@ -50,7 +50,7 @@ bool isKeyword(string input){
 
 /*Helper function that checks the variable's validity*/
 bool isValid(string input){
-	int i;
+	int i = 0;
 	int valid = true;															//initialize valid as true	
 
 		if(isalpha(input[i])) valid = true;										//if the input is only alphanumeric	that start with a letter
@@ -65,9 +65,8 @@ bool isValid(string input){
 		  	   }
 		  	   return true; 													//if the variable is valid, it will return true
 		  }
-		
 
-	else return false;															//else not
+	    else return false;															//else not
 }
 
 bool isUsed(vector<variables> var_list, string input){
@@ -210,7 +209,7 @@ vector<string> processInput(string input) {                                     
                         placeholder = "";
                         //placeholder += input[i]; 
                     }
-                }                                                             
+                }                                                        
                 placeholder += input[i]; 
             }
         }
@@ -367,14 +366,9 @@ int main() {
         
         //assume input already error checed.
         //assume input data types are already identified
-        
 
-        
         variable_history(var_list, user_command);
-        semantics(var_list, user_command);       
-        
-        
-        
+        // semantics(var_list, user_command);       
     }
 
     cout << "\nInterface is now terminated..." << endl;
