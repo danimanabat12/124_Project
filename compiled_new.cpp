@@ -80,7 +80,7 @@ int main() {
 }
 
 //main function to be called to solve expression before converting answer to string
-string arithmetic(string expression){
+string arithmetic(string expression){cout<<"entering arithmetic:	"<<expression<<endl;
 	float floatAns = solvePostfix(tokenize(infixToPostfix(expression)));	//solve for answer which is returned as float
 	//convert float answer to string
 	ostringstream ostr;
@@ -328,7 +328,7 @@ int string_size(string input){														//string size
 }
 
 
-int search(string &input, string &varname ){
+int search(string &input, string &varname ){ cout<<"entering search: "<<input<<endl;
 	int size = string_size(input);	
 	for(int i=0; i < size;i++){ 
 		string holder = "";
@@ -336,13 +336,17 @@ int search(string &input, string &varname ){
 		//concatenate until an operator is found
 		while(1){
 			holder=holder + input[i];
+			
+			if(input[i]=='(')break;
+			
 			i++;
-			if(i == size|| isOperator(input[i])){ cout<<input[i]<<endl;
+			if(i == size|| isOperator(input[i]) || input[i] == '(' || input[i] == ')'){ cout<<input[i]<<endl;
 				break;
 			}
+		
 		}
 		
-
+		cout<<"current variable: "<<holder<<endl;
 		if(holder == varname){		//if equal return the subscript (the adress of the first char of the variable to be replaced)
 			return i-string_size(holder);
 		}
@@ -373,11 +377,11 @@ string evaluate(string &input, vector <variables> &var_list){						//replaces al
 				//check if current variable is present on the input string
 								
 				int found = search(input, var_list[k].name);
-			
+				cout<<input[i]<<endl;
 				if(found != -1){
 					 
 					input.replace(found, string_size(var_list[k].name), var_list[k].value);
-					cout<<input<<endl;
+				
 				}else{
 					k++;
 				}
@@ -459,7 +463,10 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 	}
 	//if not an assignment nor a keyword, assume an arithmetic
 	else{
-		string temp = arithmetic(evaluate(user_command[0], var_list));
+		string temp = concatenate(user_command, 0);
+		temp = evaluate(temp, var_list);
+		cout<<temp<<endl;
+		temp = arithmetic(temp);
 		cout<<"Post arithmetic: "<<temp<<endl;
 		//place arithmetic function here
 	}
