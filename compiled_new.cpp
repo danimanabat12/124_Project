@@ -686,7 +686,6 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 		return false; 
 	}
 	
-	cout << "yih xd" << endl;
 	for (i = 0; i < stripedInput.size(); i++) {
 		input = stripedInput.at(i);
 		
@@ -702,7 +701,6 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 			return false; 
 		}
 
-		
 		if(isValid(input) && !isKeyword(input)) {
 			if(!isUsed(var_list, input)) {
 				varDataTypes.push_back(extractDataType(var_list, input));	
