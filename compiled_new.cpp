@@ -653,48 +653,48 @@ bool errorChecking(vector<string> user_command){
 	return stringChecker;	
 }
 
-bool processElements(vector<string> user_command, vector<variables> &var_list) {
-	
+bool processElements(vector<string> user_command, vector<variables> &var_list) {				//boolean function that checks the data type of the input and the variables's validity
+														
 	int i; 
-	string input; 
+	string input; 												//declaration of string inputs and some were initialized empty strings
 	string bin = ""; 
 	string dataType; 
 	string var_name = "";
-	string toRemove = "()";
-	bool encounteredEqual = false; 
-	bool encounteredOperator = false;
-	bool undefinedVars = false; 
+	string toRemove = "()";											//initialize parenthesis in this string variable 
+	bool encounteredEqual = false; 										//initialize boolean functions as false 
+	bool encounteredOperator = false;	
+	bool undefinedVars = false; 		
 	bool encounteredKeyword = false;
-	vector<string> stripedInput;
+	vector<string> stripedInput;										//declaration of vector variables
 	vector<string> undefined; 
 	vector<string> varDataTypes; 
 	
 	
-	for (i = 0; i < user_command.size(); i++) {
-		input = user_command.at(i); 
+	for (i = 0; i < user_command.size(); i++) {								//iterate the user_command at its maximum size
+		input = user_command.at(i); 									//store the each element in the string input
 		
-		for (int j = 0; j < 2; j++) {
-			input.erase(remove(input.begin(), input.end(), toRemove[j]), input.end()); 
+		for (int j = 0; j < 2; j++) {									//scan each element 
+			input.erase(remove(input.begin(), input.end(), toRemove[j]), input.end()); 		//erase unnecessary characters
 		}
-		if (input != "") {
+		if (input != "") {										//if no invalid characters pushback the input to the vector stripedInput
 			stripedInput.push_back(input);
 		}
 	}
-	if (stripedInput.size() == 1) { 
-		if (isValid(stripedInput.at(0)) && isUsed(var_list, stripedInput.at(0))) {
-			cout << "SNOL> Error! [" << user_command.at(0) << "] is not defined!" << endl;
-			return false;		
+	if (stripedInput.size() == 1) { 									//if the vector is 1 return true
+		if (isValid(stripedInput.at(0)) && isUsed(var_list, stripedInput.at(0))) {			//and if the variable is valid but the variable was not defined
+			cout << "SNOL> Error! [" << user_command.at(0) << "] is not defined!" << endl;		//print error because variable is not defined
+			return false;										//return false
 		}
-		return true;
+		return true;											
 	}
 	
-	if (isOperator(stripedInput.at(0)[0]) || stripedInput.at(0) == "=") {
-		cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl;
-		return false; 
+	if (isOperator(stripedInput.at(0)[0]) || stripedInput.at(0) == "=") {					//if the element of the vector is an operator or equal sign
+		cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl;	//print  unknown command
+		return false; 											//return false
 	}
 	
-	for (i = 0; i < stripedInput.size(); i++) {
-		input = stripedInput.at(i);
+	for (i = 0; i < stripedInput.size(); i++) {								//scan the element of the stripedInput vector
+		input = stripedInput.at(i);									//store each element in the string input
 		
 		if (stripedInput.size() > 3 && input.size() == 1 && i > 1 && !isOperator(stripedInput.at(i)[0]) && !isOperator(stripedInput.at(i-1)[0])) {
 			cout << input << endl;
@@ -708,85 +708,85 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 			return false; 
 		}
 
-		if(isValid(input) && !isKeyword(input)) {
-			if(!isUsed(var_list, input)) {
-				varDataTypes.push_back(extractDataType(var_list, input));	
+		if(isValid(input) && !isKeyword(input)) {								//if the variable is valid and not a keyword
+			if(!isUsed(var_list, input)) {									//also if the variable was not already used
+				varDataTypes.push_back(extractDataType(var_list, input));				//push the variable to the vector varDataTypes
 			}
 			else {
-				if (i > 0 || isOperator(stripedInput.at(i+1)[0])) {
-					undefined.push_back(input);
-					undefinedVars = true;
+				if (i > 0 || isOperator(stripedInput.at(i+1)[0])) {					//else invalid variable
+					undefined.push_back(input);							//push it to another vector called undefined
+					undefinedVars = true;								//undefinedVars is true because it is invalid
 				} 
 			}
 		}
 		
-		else if (input == "=") {
-			encounteredEqual = true;
+		else if (input == "=") {										//if the input has encountered an equal sign
+			encounteredEqual = true;									
 		}
 		
-		else if (!isValid(input) && containsNoChar (input)) {
+		else if (!isValid(input) && containsNoChar (input)) {							//if it is invalid variable and has only alphanumeric string
 			
-			for (int j = 0; j < input.size(); j++) {
-				if (isdigit(input.at(j))) {
-					bin += input.at(j);
+			for (int j = 0; j < input.size(); j++) {							//scan the input
+				if (isdigit(input.at(j))) {								//if there is a digit encountered
+					bin += input.at(j);								//concatenates the string
 				}
 				
-				else if (input.at(j) == '.') {
-					bin += input.at(j);
+				else if (input.at(j) == '.') {								//if the input encounters a decimal point
+					bin += input.at(j);								//concatenates the string
 				}
 				
 				else {
-					if (isOperator) {
-						encounteredOperator = true;
+					if (isOperator) {								//if there encountered an operator
+						encounteredOperator = true;						//then it is true
 					
 					}
-					if(!isOperand(bin) && bin != "") {
-						cout << "SNOL> [" << bin << "] is not a valid integer nor float!" << endl; 
-						return false;
+					if(!isOperand(bin) && bin != "") {						//if the string is not an empty tring and not an operand
+						cout << "SNOL> [" << bin << "] is not a valid integer nor float!" << endl; //not a numeric data type
+						return false;								//return false
 					}
-					if (!isInteger(bin) && bin !="") {
-						varDataTypes.push_back("Float"); 
-						bin = "";
+					if (!isInteger(bin) && bin !="") {						//if not an empty string and not an integer
+						varDataTypes.push_back("Float"); 					//push the string to the vector and assign as floating-point
+						bin = "";								//reset the string
 					}	
-					else if (isInteger(bin) && bin != "") {
-						varDataTypes.push_back("Int");
-						bin = "";
+					else if (isInteger(bin) && bin != "") {						//if not an empty string and is an integer
+						varDataTypes.push_back("Int");						//push the string to the vector and assign as an integer
+						bin = "";								//reset the string
 					}
 				}
 			}
 			
-			if(!isOperand(bin) && bin != "") {
-				cout << "SNOL> [" << bin << "] is not a valid integer nor float!" << endl; 
-					return false;
+			if(!isOperand(bin) && bin != "") {								//if not empty string but not an operand
+				cout << "SNOL> [" << bin << "] is not a valid integer nor float!" << endl; 		//not a numeric data type
+					return false;									//return false
 				}
-				if (!isInteger(bin) && bin !="") {
-					varDataTypes.push_back("Float"); 
-					bin = "";
+				if (!isInteger(bin) && bin !="") {							//if the string is not an integer
+					varDataTypes.push_back("Float"); 						//push it to the vector as a floating-point
+					bin = "";									//reset string
 				}	
-				else if (isInteger(bin) && bin != "") {
-					varDataTypes.push_back("Int");
-					bin = "";
+				else if (isInteger(bin) && bin != "") {							//if the string is an integer
+					varDataTypes.push_back("Int");							//push it to the vector as integer
+					bin = "";									//reset the string
 				}
 			}
 		
-		else if (isKeyword(input)) encounteredKeyword = true;
+		else if (isKeyword(input)) encounteredKeyword = true;							//if there is a keyword then set the boolean encounteredKeyword to true
 	}
 	
-	if (undefinedVars == true ) {
-		if (undefined.size() == 1 && stripedInput.at(0) == "BEG") {;
+	if (undefinedVars == true ) {											//if the undefined variables are true
+		if (undefined.size() == 1 && stripedInput.at(0) == "BEG") {;						//undefined size is 1 
 		}
 		else {
-			cout << "SNOL> Error! Undefined variables: "; 
-			for (int i = 0; i < undefined.size(); i++) {
-				cout << "[" << undefined.at(i) << "] ";
+			cout << "SNOL> Error! Undefined variables: "; 							//print error of undefied variables
+			for (int i = 0; i < undefined.size(); i++) {							//iterate the elements of the undefined
+				cout << "[" << undefined.at(i) << "] ";			
 			}
 			cout << "\n"; 
-			return false;
+			return false;											//return false
 		}
 	}
 	
-	if(encounteredEqual == true && !isUsed(var_list, stripedInput.at(0))) {
-		varDataTypes.erase(varDataTypes.begin());
+	if(encounteredEqual == true && !isUsed(var_list, stripedInput.at(0))) {						//there is an equal sign and the variable is unique
+		varDataTypes.erase(varDataTypes.begin());								
 	}
 	
 	if (varDataTypes.size() > 1) {
@@ -803,7 +803,7 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 		}
 	} 
 	
-	return true; 
+	return true; 												//if no encountered errors then the variable is valid and the data type was determined
 }
 
 vector<string> processInput(string input) {                                                            		//function that process that user command
@@ -953,8 +953,8 @@ vector<string> processInput(string input) {                                     
                     placeholder = "";    
                     placeholder += input[i];                                                                                                                      
                 }
-                else if (isOperator(placeholder[placeholder.size()-1])) {                              	//else if the current character is an operator
-                    if (!isdigit(input[i])) {                                                           //check if current input is not a digit, then we push placeholder string to the vector
+                else if (isOperator(placeholder[placeholder.size()-1])) {                              				//else if the current character is an operator
+                    if (!isdigit(input[i])) {                                                           			//check if current input is not a digit, then we push placeholder string to the vector
                         if (characterError == true) {
 							cout << "SNOL> Unknown word [" << placeholder <<"]" << endl; 
 	                    	user_command.clear();
@@ -982,7 +982,7 @@ vector<string> processInput(string input) {                                     
         i++;
     }
 
-    if (placeholder != "") {                                                                            //If the placeholder string is not empty after the loop, we add whatever's left to the vector
+    if (placeholder != "") {                                                                            			//If the placeholder string is not empty after the loop, we add whatever's left to the vector
         user_command.push_back(placeholder);
         placeholder = "";
     }
@@ -998,7 +998,7 @@ vector<string> processInput(string input) {                                     
     return user_command;
 }
 
-bool isOperator (char ch) {                                                                         	//boolean function that checks if a character is an operator
+bool isOperator (char ch) {                                                                         					//boolean function that checks if a character is an operator
     if (ch == '+' || ch == '-' || ch == '/' || ch == '*' || ch == '%') return true;
     else return false;
 }
@@ -1008,7 +1008,7 @@ bool isKeyword(string input){
 	else return false;
 }
 
-bool containsNoChar (string input) {                                                                	//boolean function that checks if a string contains alphabet charaters
+bool containsNoChar (string input) {                                                                					//boolean function that checks if a string contains alphabet charaters
     for (int i = 0; i < input.size(); i++) {
         if (isalpha(input[i])) return false; 
     }
@@ -1019,7 +1019,7 @@ bool isValid(string input){
 	int i = 0;
 	int valid = true;																					//initialize valid as true	
 
-		if(isalpha(input[i])) valid = true;																//if the input is only alphanumeric	that start with a letter
+		if(isalpha(input[i])) valid = true;												//if each element of the input has no unnecessary characters														//if the input is only alphanumeric	that start with a letter
 		else valid = false;																				//else invalid
 		
 		if(valid == true){																				//while it is valid
@@ -1047,30 +1047,30 @@ bool isUsed(vector<variables> var_list, string input) {
 	return true;
 }
 
-bool isInteger(string input){
-   	istringstream iss(input); 
-    int f; 
-    iss >> noskipws >> f; 
-    return iss.eof() && !iss.fail(); 
+bool isInteger(string input){													//boolean function to test if the input is an integer
+   	istringstream iss(input); 												//istringstream means to copy the value of the input
+    int f; 															//declare an integer variable
+    iss >> noskipws >> f; 													//produced an integer type
+    return iss.eof() && !iss.fail(); 												//return true if the input is an integer
 }
 
-bool isFloat(string input) {
-    istringstream iss(input); 
-    float f; 
-    iss >> noskipws >> f; 
-    return iss.eof() && !iss.fail(); 
+bool isFloat(string input) {													//boolean function to test id the input is a  floating-point
+    istringstream iss(input); 													//istringstream means to copy the value of the input
+    float f; 															//declare a floating-point variable
+    iss >> noskipws >> f; 													//produced a floating-point type
+    return iss.eof() && !iss.fail(); 												//return true if the input is a floating-point
 }
 
-bool isOperand(string input) {
-	bool flag = true; 
-	if(!isInteger(input) && !isFloat(input)) flag = false;
-	return flag; 
+bool isOperand(string input) {													//boolean function that checks the input if it is an operand
+	bool flag = true; 													//initialize flag as true
+	if(!isInteger(input) && !isFloat(input)) flag = false;									//if input is not an operand return false
+	return flag; 														//return true if the input is an operand
 }
 
-bool comparison(string input1, string input2){
-	if(isInteger(input1) && isInteger(input2)) return true;
-	else if(isFloat(input1) && isFloat(input2)) return true;
-	else return false;
+bool comparison(string input1, string input2){											//boolean function that compares the data type of two inputs
+	if(isInteger(input1) && isInteger(input2)) return true;									//return true if both inputs are integer
+	else if(isFloat(input1) && isFloat(input2)) return true;								//return true if both inputs are floating-point
+	else return false;													//else they are not the same data type
 }
 
 void updateDataType (vector<variables> &var_list, string var_name, string data_type) {
