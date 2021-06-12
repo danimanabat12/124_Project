@@ -1,3 +1,21 @@
+/*
+	AMDG
+	
+	Program title: Simple Number-Only Language
+	
+	Program description: This is a simplied custom programming language that utilizes C++ as its interpreter.
+	This custom programming language could perform basic programming languages concepts such as variable assignment, 
+	data type identification, arithmetic operations, etc. 
+	
+	Program creators: Cabuga, Van Joseph		2019 -
+					  Gador, Ferdinand II		2019 - 08264
+					  Manabat, Daniel Gabriel	2019 - 60012
+					  Redelosa, Beau Mary		2019 - 
+					  Vertudes, Ron Bryan		2019 - 
+*/
+
+
+//Standard Library Used
 #include<iostream>
 #include<vector> 
 #include<cctype>
@@ -19,6 +37,7 @@ typedef struct variables {
 }variables;
 
 //helper functions
+void helper();
 int string_size(string input);
 bool isOperator(char ch);
 bool isKeyword(string input);
@@ -46,7 +65,6 @@ void semantics(vector <variables> &var_list, vector <string> &user_command);
 //arithmetic functions
 string arithmetic(string); 
 string infixToPostfix(string);
-// bool isValidOperation(char);
 int getPrecedence(char);
 vector<string> tokenize(string);
 int getState(char&);
@@ -67,20 +85,77 @@ int main() {
     while(input != "EXIT!") {																	//While loop that runs until EXIT! has been entered.
         cout << "\nCommand: ";																	//Prompt the user to enter a command
         getline(cin, input);																	//Store the command to the string input
-       	vector<string> user_command = processInput(input);  									//process the user input and store them to a vector of string
-		if (!user_command.empty()) {															//if user command is not empty, we start processing the vector
-			if (errorChecking(user_command)) {													//first, we error check the user command. We call the errorChecking function
-				if (processElements(user_command, var_list)) {									//If the first errro checking did not encounter any problem, we call the processElements function
-					if(user_command.size() > 1) {												//If user_command vector contains more than one element at this point, we process the user command
-						variable_history(var_list, user_command); 								//store variables on the variable history vector
-		         		semantics(var_list, user_command);  									//process the semantics and the command in general of the user
+       	if (input == "HELP") {
+       		helper(); 	
+		}
+		else {
+			vector<string> user_command = processInput(input);  								//process the user input and store them to a vector of string
+			if (!user_command.empty()) {														//if user command is not empty, we start processing the vector
+				if (errorChecking(user_command)) {												//first, we error check the user command. We call the errorChecking function
+					if (processElements(user_command, var_list)) {								//If the first errro checking did not encounter any problem, we call the processElements function
+						if(user_command.size() > 1) {											//If user_command vector contains more than one element at this point, we process the user command
+							variable_history(var_list, user_command); 							//store variables on the variable history vector
+			         		semantics(var_list, user_command);  								//process the semantics and the command in general of the user
+						}
 					}
-				}
-			}		
-		}      
+				}		
+			}      
+		}
     }
 
     cout << "\nInterface is now terminated..." << endl;											//interface statement when the loop stopped working
+}
+
+void helper() {
+	cout << "=============================================" << endl; 
+	cout << "SNOL General rules, guidelines, and How to's!" << endl; 
+	cout << "=============================================" << endl;
+	
+	cout << "\n\nRULES and GUIDELINES" << endl;
+	cout << "\t1. FORMATTING: > Use spaces as a separator. Extra spaces, however, will be ignored." << endl;
+	cout << "\t   Example: var = 6 -> Contains one space between every word" << endl;  
+	cout << "\t            var     =   6 -> Contains more than one space for every word. This will still be evaluated like above." << endl;  
+	cout << "\t2. CASE-SENSITIVE: > All words are case sensitive" << endl;
+	cout << "\t   Example: var is different from VAR, and so is vAr. They will be treated as different entities" << endl;
+	cout << "\t3. DATA TYPE: > This programming language only has two data types, namely: INTEGER and FLOATING point" << endl;
+	cout << "\t              > The operands for arithmetic operations SHOULD have a similar data type" << endl;
+	cout << "\t   Example: var = 1 + 5     -> Correct, since both 1 and 5 are INTEGERS" << endl;   
+	cout << "\t            var = 1.5 + 3.5 -> Correct, since both 1.5 and 3.5 are FLOATING-POINT" << endl;  
+	cout << "\t            var = 1.5 + 3   -> ERROR. 1.5 and 3 are conflicting data types" << endl;
+	cout << "\t4. VARIABLES: > Variables always be alphanumeric. Also, it should start with letters, not numbers." << endl;
+	cout << "\t   Example: var    -> Correct, since this variable is alphanumeric" << endl; 
+	cout << "\t            var01  -> Also correct, this variable is alphanumeric" << endl; 
+	cout << "\t           !var01  -> ERROR, this contains a special character" << endl; 
+	cout << "\t           1var01  -> ERROR, variables starting with numbers is not allowed" << endl; 
+	cout << "\n\t              > NOTE: Variables SHOULD BE DEFINED FIRST before they can be used." << endl;
+	cout << "\t5. INVALID SYNTAX: > Your command should be logical and acceptable. Here are some cases where command will result to an error: " << endl;
+	cout << "\t   Example: PRINT -> Calling the PRINt keyword (or BEG) without a targeted literal or variable" << endl; 
+	cout << "\t            PRINT var -> When var is not yet declared, this will result to an error" << endl; 
+	cout << "\t            PRINT BEG -> Using two or more special keyword on a specific command" << endl; 
+	cout << "\t            num PRINT xd = 1 -> Unordered command. Special keywords found in between words" << endl;
+	cout << "\t            num = var1 var+1 -> Illogical arithmetic operations. Some variables or literals are not used on an operation" << endl;  
+	
+	cout << "\n\nHOW TOs" << endl;
+	cout << "\t1. Declaring a variable: Use either the assigment operator ('=') or the special keyword BEG" << endl;
+	cout << "\t   Example: var = 6 or BEG var" << endl; 
+	cout << "\t2. Arithmetic operations: These are the list of available operations: " << endl;
+	cout << "\t   + -> Addition. Example: opr_1 + opr_2 + opr_3, where opr could be a variable or a literal" << endl; 
+	cout << "\t   - -> Subtraction. Example: opr_1 - opr_2 - opr_3, where opr could be a variable or a literal" << endl; 
+ 	cout << "\t   * -> Multiplication. Example: opr_1 * opr_2 * opr_3, where opr could be a variable or a literal" << endl; 
+ 	cout << "\t   + -> Division. Example: opr_1 / opr_2, where opr could be a variable or a literal" << endl; 
+ 	cout << "\t   % -> Modulo. Example: opr_1 % opr_2, where opr could be a variable or a literal. NOTE: INTEGERS types are only allowed for this operation" << endl; 
+ 	cout << "\n\t   NOTE: The precedence of arithmetic operations follows PEMDAS. You can also use parentheses as long as they are balanced" << endl; 
+ 	cout << "\t3. SPECIAL KEYWORDS: > This program has only 4 special keywords, namely: PRINT, BEG, HELP, and EXIT!" << endl;
+	cout << "\t                     > These keywords cannot be used as variable names." << endl;
+	cout << "\t   Function of every special keywords: " << endl;
+	cout << "\t       > PRINT *variable_name or literal* -> Prints the targeted variable or literal." << endl;
+	cout << "\t       > BEG *variable_name* -> Asks for a value for the targeted variable." << endl;
+	cout << "\t       > HELP -> prompts the general rules and guidelines of this program." << endl;
+	cout << "\t       > EXIT! -> Exits this program" << endl;
+	
+	cout << "\n\n=============================================" << endl; 
+	cout << "THANK YOU!" << endl; 
+	system("pause");
 }
 
 //Pre-processing function that tokenizes the user command
@@ -253,18 +328,23 @@ vector<string> processInput(string input) {
                 else if (isalnum(input[i])) {															//if the current character is alphanumeric, then we concatenate it to the placeholder string													
                     placeholder += input[i];
                 }                                              
-                else {																					//else, an invalid character has been entered by the user. Set characerError to true
-                	characterError = true; 
-        			placeholder += input[i];
+                else {																					//else, an invalid character has been entered by the user. 
+        			placeholder += input[i];															//add the invalid character to the placeholder string
+		        	if (placeholder != "EXIT!") {														//If placeholder is not equal to EXIT! command, we set characterError bool to false
+		        		characterError = true; 
+					}
                 }
             }
         }
 
-        else {																							//else, an invalid character has been entered by the user. Set characterError to true
-        	characterError = true; 
-        	placeholder += input[i];
-        }
-        i++;
+       else {																					//else, an invalid character has been entered by the user. 
+			placeholder += input[i];															//add the invalid character to the placeholder string
+        	if (placeholder != "EXIT!") {														//If placeholder is not equal to EXIT! command, we set characterError bool to false
+        		characterError = true; 
+			}
+    	}
+    	
+    	i++;
     }
 
     if (placeholder != "") {                                                                            			//If the placeholder string is not empty after the loop, we add whatever's left to the vector
@@ -272,6 +352,12 @@ vector<string> processInput(string input) {
         placeholder = "";
     }
     
+	//===============error checking=================//
+    if (user_command.at(0) == "HELP" || user_command.at(0) == "EXIT!") {
+    	cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
+    	user_command.clear(); 
+    	return user_command; 
+	}
     
     for (int i = 0; i < user_command.size(); i++) {
     	if (isKeyword(user_command.at(i)) && i > 0) {
@@ -279,7 +365,17 @@ vector<string> processInput(string input) {
     		user_command.clear(); 
     		return user_command; 
 		}
+		if(!containsNoChar(user_command.at(i)) && !isValid(user_command.at(i))) {
+			cout << "SNOL> Error! Invalid variable name [" << user_command.at(i) <<"]" << endl;
+			user_command.clear();
+			return user_command; 
+		}
 	}
+	
+	for (i=0; i < user_command.size(); i++) {
+		cout << "debug: " << user_command.at(i) << endl; 
+	}
+	
     return user_command;
 }
 
@@ -475,6 +571,7 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 	bool encounteredOperator = false;													//--> Checks if we alreadt encountered an operator 
 	bool undefinedVars = false; 														//--> Check if a specific variable name is undefined
 	bool encounteredKeyword = false;													//--> Check if we already encoutered a special keyword (i.e., PRINT and BEG)
+	bool encounteredModulo = false;														//--> Check if we already encountered modulo operator
 	vector<string> stripedInput;														//--> Vector of type string that stores the cleaned command tokens					
 	vector<string> undefined; 															//--> Vector of type string that stores undefined variables
 	vector<string> varDataTypes; 														//--> Vector of type string that stores the data type of variables and numeric literals
@@ -520,13 +617,11 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 		//Example: var1 = var2 var3*4. This is an invalid syntax. 
 
 		if (stripedInput.size() > 3 && input.size() == 1 && i > 1 && !isOperator(stripedInput.at(i)[0]) && !isOperator(stripedInput.at(i-1)[0])) {
-			cout << input << endl;
 			cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl;
 			return false; 
 		}
 		
 		if (stripedInput.size() > 2 && isValid(input) && i > 1 && (!isOperator(stripedInput.at(i-1)[0]) && stripedInput.at(i-1) != "=")) {
-			cout << input << endl;
 			cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl;
 			return false; 
 		}
@@ -550,6 +645,10 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 			encounteredEqual = true;									
 		}
 		
+		else if (input == "MOD") {
+			encounteredModulo = true;
+		}
+		
 		//else, checks if the current interation on the vector is an arithmetic oepration involving literals
 		else if (!isValid(input) && containsNoChar (input)) {						
 			
@@ -559,8 +658,11 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 				}
 				
 				else {																				//else, check for the following classification
-					if (isOperator) {																//if the current character is an operator, set the encounteredOperator variable to true
-						encounteredOperator = true;						
+					if (isOperator(input.at(j))) {																//if the current character is an operator, set the encounteredOperator variable to true
+						encounteredOperator = true;	
+						if(input.at(j) == '%') {
+							encounteredModulo = true;	
+						}					
 					}
 					if(!isOperand(bin) && bin != "") {												//if not an operator and the bin contains something, this will result to an error
 						cout << "SNOL> [" << bin << "] is not a valid integer nor float!" << endl; 
@@ -617,11 +719,15 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 		for (int i = 0; i < varDataTypes.size() - 1; i++) {											//trace the whole varDataTypes vector
 			string str1 = varDataTypes.at(i);														//extract the data type of the element at i and store it to a string
 			string str2 = varDataTypes.at(i+1);														//extract the data type of the element at i+1 and store it to a string
+			cout << "bisong" << endl;
 			if(str1 != str2) {																		//if two string is not equal, then the command contains data types that are not the same
 				if (!(encounteredEqual == true && stripedInput.size() == 3 && encounteredOperator == false)) {
 					cout << "SNOL> Error! Operands must be of the same type in an arithmetic operation!" << endl;
 					return false;
 				} 
+			}
+			if ((str1 == "Float" || str2 == "Float") && encounteredModulo == true) {
+				cout << "SNOL> Error! Modulo operations can only be used by integer values!" << endl;
 			}
 		}
 	} 
@@ -864,18 +970,6 @@ string infixToPostfix(string infix){
     }
     return postfix;
 }// end of function infixToPostfix
- 
-//function that checks if an operation is valid
-// bool isValidOperation(char operation){							//redundant function 
-//     switch (operation){
-// 	    case '+': case '-': case '*': case '/': case '%': 
-// 	        return true;
-// 	        break;
-// 	    default:
-// 	        return false;
-// 	        break;
-//     }
-// }// end of function isValidOperation
 
 int getPrecedence(char operation){														//function that returns a designated precedence for valid operators
     int priority = 0;
@@ -977,7 +1071,7 @@ float solvePostfix(const vector<string>& postfix){										//function that solv
             }
         }
         else{
-            cout << "\nERROR #3: Idk what happened lmao but something went VERY WRONG\n";
+            cout << "\nSNOL> Invalid arithmetic operation! \n";
             exit(1);
         }
     }
@@ -1013,13 +1107,15 @@ float performOp(char operation, float op1, float op2){									//helper function
     return result;
 }// end of function performOp
 
+
+//===============================helper functions===============================//
 bool isOperator (char ch) {                                                            	//boolean function that checks if a character is an operator
     if (ch == '+' || ch == '-' || ch == '/' || ch == '*' || ch == '%') return true;
     else return false;
 }
 
 bool isKeyword(string input){
-	if(input == "BEG" || input == "PRINT" || input == "MOD") return true;				//if the set variable is a keyword
+	if(input == "BEG" || input == "PRINT" || input == "HELP") return true;				//if the set variable is a keyword
 	else return false;
 }
 
