@@ -384,6 +384,7 @@ bool errorChecking(vector<string> user_command){																		//bool errorCh
 	bool stringChecker=false;																							//stringChecker returns a bool value to indicate if the user-input is valid or not
 	int openParenthesis=0;																								//counts the number of open parentheses on the expression
 	int closeParenthesis=0;																								//counts the number of close parentheses on the expression
+	bool isMismatch = false;																							//checks if parentheses are mismatched or not equal in an arithmetic equation
 	
 	if(user_command.size()==1){																							//if the size of the vector is 1, 
 		
@@ -543,17 +544,23 @@ bool errorChecking(vector<string> user_command){																		//bool errorCh
 			}	
 		}
 		
-		if(equalCount==0&&operatorCount==0)stringChecker=false;
+		if(equalCount==0&&operatorCount==0) stringChecker=false;
 		
-		if(equalCount>1&&openParenthesis>1&&closeParenthesis>1){														//enter this if statement if the expression has equal sign and parenthesese
-			if((equalCount==1||equalCount==0)&&openParenthesis==closeParenthesis){ 										//if the amount of equal sign does not exceed one, and the number of parenthesis are equal, the expression is valid and true
+		if(equalCount>=1&&openParenthesis>=1&&closeParenthesis>=1){														//enter this if statement if the expression has equal sign and parenthesese
+			if((equalCount==1||equalCount==0) && openParenthesis==closeParenthesis){ 										//if the amount of equal sign does not exceed one, and the number of parenthesis are equal, the expression is valid and true
 				stringChecker=true;
 			}
-			else stringChecker=false; 																							//return otherwise
+			else {
+				stringChecker=false; 																							//return otherwise
+				if (openParenthesis != closeParenthesis) isMismatch = true;
+			}
 			
 		}	
 
-		if(stringChecker==false) cout << "SNOL> Unknown Command! Does not match any valid command of the language" << endl; 	//print this statement if the stringchecker is false
+		if(stringChecker==false) {
+			if (isMismatch == true) cout <<"SNOL> Error! There are mismatched parentheses in the arithmetic operation!" << endl; 
+			else cout << "SNOL> Unknown Command! Does not match any valid command of the language" << endl; 	//print this statement if the stringchecker is false
+		}
 	}
 	
 	return stringChecker;	
