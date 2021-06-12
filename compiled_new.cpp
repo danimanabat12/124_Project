@@ -9,6 +9,7 @@
 #include<cmath>
 #include<cstdlib>
 
+//hehe
 using namespace std; 
 
 //typedef struct for the masterlist of variables
