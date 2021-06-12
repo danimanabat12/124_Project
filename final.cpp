@@ -7,11 +7,11 @@
 	This custom programming language could perform basic programming languages concepts such as variable assignment, 
 	data type identification, arithmetic operations, etc. 
 	
-	Program creators: Cabuga, Van Joseph		2019 -
+	Program creators: Cabuga, Van Joseph		2019 - 08453
 					  Gador, Ferdinand II		2019 - 08264
 					  Manabat, Daniel Gabriel	2019 - 60012
-					  Redelosa, Beau Mary		2019 - 
-					  Vertudes, Ron Bryan		2019 - 
+					  Redelosa, Beau Mary		2019 - 60019
+					  Vertudes, Ron Bryan		2019 - 08419
 */
 
 
