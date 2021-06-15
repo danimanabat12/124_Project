@@ -10,7 +10,7 @@
 	Program creators: Cabuga, Van Joseph		2019 - 08453
 					  Gador, Ferdinand II		2019 - 08264
 					  Manabat, Daniel Gabriel	2019 - 60012
-					  Redelosa, Beau Mary		2019 - 60019
+					  Redelosa, Beau Mary		2019 - 60013
 					  Vertudes, Ron Bryan		2019 - 08419
 */
 
@@ -26,6 +26,8 @@
 #include<algorithm>
 #include<cmath>
 #include<cstdlib>
+#include<string>
+#include<stack>
 
 using namespace std; 
 
@@ -70,6 +72,7 @@ vector<string> tokenize(string);
 int getState(char&);
 float solvePostfix(const vector<string>&);
 float performOp(char, float, float);
+
 enum states{REJECT = 0, INTEGER, REAL, NEGATIVE, OPERATOR, UNKNOWN, SPACE};
 
 int main() {
@@ -93,7 +96,7 @@ int main() {
 			if (!user_command.empty()) {														//if user command is not empty, we start processing the vector
 				if (errorChecking(user_command)) {												//first, we error check the user command. We call the errorChecking function
 					if (processElements(user_command, var_list)) {								//If the first errro checking did not encounter any problem, we call the processElements function
-						if(user_command.size() > 1) {											//If user_command vector contains more than one element at this point, we process the user command
+						if(user_command.size() > 1 || !isValid(user_command.at(0))) {			//If user_command vector contains more than one element or if the input is an arithmetic expression at this point, we process the user command
 							variable_history(var_list, user_command); 							//store variables on the variable history vector
 			         		semantics(var_list, user_command);  								//process the semantics and the command in general of the user
 						}
@@ -358,6 +361,20 @@ vector<string> processInput(string input) {
     	user_command.clear(); 
     	return user_command; 
 	}
+	
+	if (user_command.size() ==  2 && (isKeyword(user_command.at(0)))) {
+		if (!isValid(user_command.at(1))) {
+			cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl;
+			user_command.clear(); 
+			return user_command;
+		}
+	}
+	
+	if (user_command.size() == 1 && (isKeyword(user_command.at(0)))) {
+		cout << "SNOL> Error! There are no target variable! Usage should be: " << user_command.at(0) << " [variable name]" << endl;
+		user_command.clear(); 
+    	return user_command;
+	}
     
     for (int i = 0; i < user_command.size(); i++) {
     	if (isKeyword(user_command.at(i)) && i > 0) {
@@ -372,18 +389,13 @@ vector<string> processInput(string input) {
 		}
 	}
 	
-	for (i=0; i < user_command.size(); i++) {
-		cout << "debug: " << user_command.at(i) << endl; 
-	}
-	
     return user_command;
 }
 
 bool errorChecking(vector<string> user_command){																		//bool errorChecking() function created by: Ferdinand A. Gador II
 	
 	bool stringChecker=false;																							//stringChecker returns a bool value to indicate if the user-input is valid or not
-	int openParenthesis=0;																								//counts the number of open parentheses on the expression
-	int closeParenthesis=0;																								//counts the number of close parentheses on the expression
+	int parenthesisChecker=0;																							//checks if the parentheses are equal and follows the proper formatting
 	bool isMismatch = false;																							//checks if parentheses are mismatched or not equal in an arithmetic equation
 	
 	if(user_command.size()==1){																							//if the size of the vector is 1, 
@@ -394,15 +406,23 @@ bool errorChecking(vector<string> user_command){																		//bool errorCh
 
 			if(isdigit(tempString[0])||tempString[0]=='('){																//if the first character of the string is an open parenthesis or digit, execute this code snippet
 
-				for(int j=0;j<tempString.size();j++){	
-																					//for loop scans every character of the string , checks for operators, parenthesis and integers
+				for(int j=0;j<tempString.size();j++){																	//for loop scans every character of the string , checks for operators, parenthesis and integers	
+																					
 					if(isdigit(tempString[j])||tempString[j]=='+'||tempString[j]=='-'||tempString[j]=='*'||tempString[j]=='/'||tempString[j]=='%'||tempString[j]=='('||tempString[j]==')'||tempString[j]=='.'){
-						if(tempString[j]=='(')openParenthesis++;														//if an open parenthesis is encountered, increment
-						else if(tempString[j]==')')closeParenthesis++; 													//if a close parenthesis is encountered, increment
+						if(tempString[j]=='(')parenthesisChecker++;														//if an open parenthesis is encountered, increment
+						else if(tempString[j]==')')parenthesisChecker--; 												//if a close parenthesis is encountered, decrement
 						stringChecker=true;																				//return true if string contains valid characters
 					}
 					else{
-						stringChecker=false;																			//return false if string contain invalid characters
+						stringChecker=false;																			//return false if the string contain invalid characters
+						break;
+					}
+										
+					if(parenthesisChecker==0||parenthesisChecker==1){													//checks the proper formatting of parenthesis, if parenthesisChecker exceeds 1 or is less than 0 - indicate an error
+						continue;																						//continue the loop indicating parenthesisChecker is 0/1
+					}else{
+						stringChecker=false;																			//return false value - indicating the existence of improper parenthesis formatting
+						isMismatch=true;
 						break;
 					}
 				}
@@ -422,14 +442,15 @@ bool errorChecking(vector<string> user_command){																		//bool errorCh
 				}
 			}else{;}
 			
-			if(stringChecker==false) cout << "SNOL> Unknown Word [" << tempString << "]" << endl;						//if stringchecker is false, print the unknown word
+			if(parenthesisChecker==0)stringChecker=true;																//return true if parenthesisChecker is 0
+				else stringChecker=false;																				//return false if parenthesisChecker is not 0
+				
+			if(stringChecker==false) cout << "SNOL> Unknown Word [" << tempString << "]" << endl; 						//if stringchecker is false, print the unknown word
 			
 		}
 
 		else if(user_command.at(0)=="EXIT!")exit(0);																	//if user input is EXIT, terminate the function immediately
-	}
-	
-	else if(user_command.size()==2&&(user_command.at(0)=="PRINT"||user_command.at(0)=="BEG")){							//if the vectors has a size of two
+	}else if(user_command.size()==2&&(user_command.at(0)=="PRINT"||user_command.at(0)=="BEG")){							//if the vectors has a size of two
 		
 		if(user_command.at(0)=="BEG"){																					//user calls the BEG function
 			
@@ -450,8 +471,7 @@ bool errorChecking(vector<string> user_command){																		//bool errorCh
 				}
 			}
 			
-			if(stringChecker==false) cout << "SNOL> Unknown Word [" << tempString << "]" << endl; 								//if stringchecker is false, print the unknown word
-			
+			if(stringChecker==false) cout << "SNOL> Unknown Word [" << tempString << "]" << endl; 						//if stringchecker is false, print the unknown word	
 			
 		}
 		
@@ -483,9 +503,9 @@ bool errorChecking(vector<string> user_command){																		//bool errorCh
 						}
 					}
 				}
-				if(stringChecker==false) cout << "SNOL> Unknown Word [" << tempString << "]" << endl;							//if stringchecker is false, print the unknown word
+				if(stringChecker==false) cout << "SNOL> Unknown Word [" << tempString << "]" << endl;					//if stringchecker is false, print the unknown word
 			
-		}else cout << "SNOL> Unknown Command! Does not match any valid command of the language" << endl; 						//if the user inserted an invalid command, print this statement
+		}else cout << "SNOL> Unknown Command! Does not match any valid command of the language" << endl; 				//if the user inserted an invalid command, print this statement
 				
 	}
 	
@@ -522,15 +542,23 @@ bool errorChecking(vector<string> user_command){																		//bool errorCh
 						
 						if(isdigit(tempString[j])||tempString[j]=='+'||tempString[j]=='-'||tempString[j]=='*'||tempString[j]=='/'||tempString[j]=='%'||tempString[j]=='('||tempString[j]==')'||tempString[j]=='.'){
 							if(tempString[j]=='+'||tempString[j]=='-'||tempString[j]=='*'||tempString[j]=='/'||tempString[j]=='%')operatorCount++;//if an operator is encountered, increment
-							if(tempString[j]=='(')openParenthesis++; 													//if open parenthesis is encountered, increment
-							else if(tempString[j]==')')closeParenthesis++; 												//if close parenthesis is encountered, increment
+							if(tempString[j]=='(')parenthesisChecker++; 												//if open parenthesis is encountered, increment
+							else if(tempString[j]==')')parenthesisChecker--; 											//if close parenthesis is encountered, decrement
 							stringChecker=true; 																		//return true value if valid character is met
 						}
 						else{
 							stringChecker=false; 																		//return false if invalid character is encountered
 							break;																						//break out of the loop
 						}
-					}	
+												
+						if(parenthesisChecker==0||parenthesisChecker==1){												//checks the proper formatting of parenthesis, if parenthesisChecker exceeds 1 or is less than 0 - indicate an error
+							continue;																					//continue the loop indicating parenthesisChecker is 0/1
+						}else{
+							stringChecker = false;																		//return false value - indicating the existence of improper parenthesis formatting
+							isMismatch = true;																			
+							break;
+						}						
+					}	 
 				}
 
 				else if(tempString[0]=='='){ 																			//if the vector contained an equal sign
@@ -544,22 +572,11 @@ bool errorChecking(vector<string> user_command){																		//bool errorCh
 			}	
 		}
 		
-		if(equalCount==0&&operatorCount==0) stringChecker=false;
-		
-		if(equalCount>=1&&openParenthesis>=1&&closeParenthesis>=1){														//enter this if statement if the expression has equal sign and parenthesese
-			if((equalCount==1||equalCount==0) && openParenthesis==closeParenthesis){ 										//if the amount of equal sign does not exceed one, and the number of parenthesis are equal, the expression is valid and true
-				stringChecker=true;
-			}
-			else {
-				stringChecker=false; 																							//return otherwise
-				if (openParenthesis != closeParenthesis) isMismatch = true;
-			}
-			
-		}	
+		if(equalCount==0&&operatorCount==0) stringChecker=false;														//checks if the string contained an equal sign or an operator
 
 		if(stringChecker==false) {
 			if (isMismatch == true) cout <<"SNOL> Error! There are mismatched parentheses in the arithmetic operation!" << endl; 
-			else cout << "SNOL> Unknown Command! Does not match any valid command of the language" << endl; 	//print this statement if the stringchecker is false
+			else cout << "SNOL> Unknown Command! Does not match any valid command of the language" << endl; 			//print this statement if the stringchecker is false
 		}
 	}
 	
@@ -606,7 +623,7 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 			return false;																//return false to the main function									
 		}
 		//else, return true
-		return true;											
+		else if (isValid(stripedInput.at(0)) && !isUsed(var_list, stripedInput.at(0))) return true;											
 	}
 	
 	//Check if the first character on the first element on the input vector is an operator or an equal sign. If yes, it will result to an error
@@ -726,7 +743,6 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 		for (int i = 0; i < varDataTypes.size() - 1; i++) {											//trace the whole varDataTypes vector
 			string str1 = varDataTypes.at(i);														//extract the data type of the element at i and store it to a string
 			string str2 = varDataTypes.at(i+1);														//extract the data type of the element at i+1 and store it to a string
-			cout << "bisong" << endl;
 			if(str1 != str2) {																		//if two string is not equal, then the command contains data types that are not the same
 				if (!(encounteredEqual == true && stripedInput.size() == 3 && encounteredOperator == false)) {
 					cout << "SNOL> Error! Operands must be of the same type in an arithmetic operation!" << endl;
@@ -905,31 +921,38 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 	}
 }
 
-//main function to be called to solve expression before converting answer to string
+//main function to be called to manipulate then solve expression before converting answer to string
 string arithmetic(string expression){
-	float floatAns = solvePostfix(tokenize(infixToPostfix(expression)));				//solve for answer which is returned as float
-	ostringstream ostr;																	//convert float answer to string
-	ostr<<floatAns;
-	string stringAns = ostr.str();
-	return stringAns;																	//return string answer	
+    for(unsigned i = 0; i < expression.length(); i++){									//loop to manipulate expression
+    	//if close then open parentheses encountered without operators before or after, respectively
+    	if(i>0 && ((expression[i] == '(' && (isdigit(expression[i-1]) || expression[i-1] == ')')) || (i>0 && isdigit(expression[i]) && expression[i-1] == ')')))
+    		expression.insert(i, 1, '*');												//adds multiplication symbol in between
+        else if(expression[i] != '-')
+			continue;
+		else if(i + 1 < expression.length() && isOperator(expression[i + 1]))
+			continue;
+        if (i == 0 || isOperator(expression[i - 1])|| expression[i - 1] == '(' )		//if negative number encountered
+            expression[i] = '~';														//changes '-' before it to  '~' to avoid confusion
+    }
+	try{																				//block of code to try
+		float floatAns = solvePostfix(tokenize(infixToPostfix(expression)));			//solve for answer which is returned as float
+		ostringstream ostr;																//convert float answer to string
+		ostr<<floatAns;
+		string stringAns = ostr.str();
+		return stringAns;																//return string answer	
+		throw (floatAns);
+	}
+	catch(...){																			//upon exception, print error message
+		cout << "\nSNOL> Error! Invalid arithmetic equation!\n";
+	}													
 }//end of arithmetic function
 
 //function that converts infix string to postfix string
 string infixToPostfix(string infix){
     string postfix;
     stack<char> charStack;
-    unsigned i;
-    
-    for(i = 0; i < infix.length(); i++){												//negative numbers now symbolized by '~' to avoid confusion
-        if(infix[i] != '-')
-			continue;
-		else if(i + 1 < infix.length() && isOperator(infix[i + 1]))
-			continue;
-        if (i == 0 || isOperator(infix[i - 1])|| infix[i - 1] == '(' )
-            infix[i] = '~';
-    }
- 
-    for (i = 0; i < infix.length(); i++){
+
+    for (unsigned i = 0; i < infix.length(); i++){
         
         if ((isdigit(infix[i])) || (infix[i] == '.') || (infix[i] == '~'))				//numbers moved to postfix string
             postfix += infix[i];
@@ -958,16 +981,12 @@ string infixToPostfix(string infix){
             }
             if (!charStack.empty()) 													//if stack isn't empty, it means opening parenthesis is on top so pop it
                 charStack.pop();
-            else{
-                cout << "\nERROR #5: Mismatched Parenthesis\n";
-                exit(1);
-            }
+            else
+				return NULL;
         }
 
-        else{
-            cout << "\nERROR #1: Invalid character in expression\n";
-            exit(1);
-        }
+        else
+            return NULL;
     }
  
     
@@ -1014,8 +1033,8 @@ vector<string> tokenize(string postfix){												//function that tokenizes a 
         currChar = postfix[i];
         col = getState(currChar);														//get designated column of current character
         if ((currState == REAL) && (col == REAL)){
-            cerr << "\nERROR #2: multiple decimal points\n";
-            exit(1);
+            cerr << "\nSNOL> Error! Invalid Number Format. Multiple decimal points found.\n";
+            return vector<string>();													//return empty vector
         }
         currState = stateTable[currState][col];											//get current state according to FSM
         
@@ -1034,7 +1053,7 @@ vector<string> tokenize(string postfix){												//function that tokenizes a 
     if (currToken != " ")																//double check to make sure last token is saved
         tokens.push_back(currToken);
     return tokens;
-}// end of function Lexer
+}// end of function tokenize
 
 int getState(char &currChar){															//function that returns the state of a character being tokenized
     if(isspace(currChar))
@@ -1077,10 +1096,6 @@ float solvePostfix(const vector<string>& postfix){										//function that solv
                 floatStack.push(answer);
             }
         }
-        else{
-            cout << "\nSNOL> Invalid arithmetic operation! \n";
-            exit(1);
-        }
     }
     
     if (!floatStack.empty())															// pop the final answer from the stack, and return to main
@@ -1107,8 +1122,7 @@ float performOp(char operation, float op1, float op2){									//helper function
 	        result = ((int)op1 % (int)op2) + modf(op1, &op2);
 	        break;
 	    default:
-	    	cout << "\nSNOL> Error! Invalid arithmetic equation!\n";					//upon checking, this function will never reach this part
-	        exit(1);																		//due to pre-error checking of the user command
+	    	cout << "\nSNOL> Error! Invalid arithmetic equation!\n";					//upon checking, this function will never reach this part due to pre-error checking of the user command
 	        break;
     }
     return result;
