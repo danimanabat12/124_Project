@@ -782,7 +782,7 @@ int string_size(string input){																		//string size
 }
 
 
-int search(string &input, string &varname ){ cout<<"entering search: "<<input<<endl;
+int search(string &input, string &varname ){
 	int size = string_size(input);	
 	for(int i=0; i < size;i++){ 
 		string holder = "";
@@ -793,13 +793,12 @@ int search(string &input, string &varname ){ cout<<"entering search: "<<input<<e
 			if(input[i]=='(')break;
 			
 			i++;
-			if(i == size|| isOperator(input[i]) || input[i] == '(' || input[i] == ')'){ cout<<input[i]<<endl;
+			if(i == size|| isOperator(input[i]) || input[i] == '(' || input[i] == ')'){ 
 				break;
 			}
 		
 		}
 		
-		cout<<"current variable: "<<holder<<endl;
 		if(holder == varname){																		//if equal return the subscript (the adress of the first char of the variable to be replaced)
 			return i-string_size(holder);
 		}
@@ -812,7 +811,6 @@ int search(string &input, string &varname ){ cout<<"entering search: "<<input<<e
 string evaluate(string &input, vector <variables> &var_list){										//replaces all variables with their corresponding values for easier solving
 	int i=0,j=1;
 	
-	cout<<input<<endl;
 	while(i < j){
 
 		j=string_size(input);			
@@ -828,7 +826,7 @@ string evaluate(string &input, vector <variables> &var_list){										//replace
 			int k=0, l=0;
 			while(k < var_list.size()){																//find and replace all present variables in the string	
 				int found = search(input, var_list[k].name);										//check if current variable is present on the input string
-				cout<<input[i]<<endl;
+				
 				if(found != -1){	 
 					input.replace(found, string_size(var_list[k].name), var_list[k].value);
 				}
@@ -840,7 +838,6 @@ string evaluate(string &input, vector <variables> &var_list){										//replace
 		i++;
 	}
 	
-	cout<<"post eval:"<<input<<endl;
 	return input;
 }
 
@@ -870,8 +867,6 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 				else var_list[i].type = "Int";
 				
 				
-				cout<<"datatype of "<<var_list[i].name<<" is "<<var_list[i].type<<endl;
-				cout<<"Post arithmetic: "<<	var_list[i].value<<endl;
 				break;	
 			}
 			i++;
@@ -879,14 +874,14 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 	}
 	//check if keyword
 	else if(isKeyword(user_command[0])){
-		if(user_command[0] == "PRINT"){
+		if(user_command[0] == "PRINT"){		//if first user command input in string is PRINT, assume print statement
 			string input = concatenate(user_command, 1);
 			input = evaluate(input, var_list);
 
 			cout<<input<<endl;
 		}
 		
-		else if(user_command[0] == "BEG"){ 
+		else if(user_command[0] == "BEG"){ //if first user command input in string is BEG, assume beg statement
 			int i=0;
 			string input;
 
@@ -897,7 +892,6 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 					
 					//place arithmetic function here
 					var_list[i].value = arithmetic(evaluate(input, var_list));
-					cout<<"Post arithmetic: "<<	var_list[i].value<<endl;
 					
 					if(!isInteger(var_list[i].value))var_list[i].type = "Float";		//determine if data type is float or integer
 					else var_list[i].type = "Int";
@@ -914,9 +908,8 @@ void semantics(vector <variables> &var_list, vector <string> &user_command){				
 	else{
 		string temp = concatenate(user_command, 0);
 		temp = evaluate(temp, var_list);
-		cout<<temp<<endl;
 		temp = arithmetic(temp);
-		cout<<"Post arithmetic: "<<temp<<endl;
+		
 		//place arithmetic function here
 	}
 }
