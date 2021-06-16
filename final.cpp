@@ -951,7 +951,7 @@ int search(string &input, string &varname ){
 		while(1){																					//concatenate until an operator is found
 			holder=holder + input[i];
 			
-			if(input[i]=='(')break;
+			if(input[i]=='(' || input[i]=='-')break;
 			
 			i++;
 			if(i == size|| isOperator(input[i]) || input[i] == '(' || input[i] == ')'){ 
