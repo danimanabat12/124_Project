@@ -229,6 +229,16 @@ vector<string> processInput(string input) {
 		}
 	
         else if (isOperator(input[i])) {                                                             		//checks if the current character is an operator
+			if (user_command.size() && user_command.back() == "=" && placeholder == "") {
+				if (input[i] == '-' && isdigit(input[i+1])) {
+					;
+				} 
+				else {
+					cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
+					user_command.clear();
+	                return user_command;
+				}
+			}
 			if (containsNoChar(placeholder)) {                                                          	//if yes, we check if the placeholder string contains no character 
 				if (placeholder != "") {
 					//error checking if statement which evaluates the syntax of the input. Brute force to avoid any complications
@@ -243,11 +253,6 @@ vector<string> processInput(string input) {
 		                return user_command;
 					}
 				}
-//				if ((input[i] == '-' && !isdigit(input[i+1])  && isOperator(user_command.back()[user_command.back().size()-1]))) {
-//					cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
-//					user_command.clear();
-//	                return user_command;
-//				}
                 placeholder += input[i];                                                                 	//if it doesn't contains any character, we concatenate the current input to the placeholder string
 		    }                                                                                               
             else {                                                                                     		//else,
@@ -263,8 +268,7 @@ vector<string> processInput(string input) {
 	                	return user_command;
 					}
                     user_command.push_back(placeholder); 
-//                        user_command.push_back(string(1, input[i])); 
-//                        placeholder = "";
+
 					placeholder = input[i];                                                                    	//reset placeholder
                 }
             }
@@ -297,7 +301,19 @@ vector<string> processInput(string input) {
 				break;
 			}
 			//----------the lines until the end of this function just copies the same procedures when the input != ' ' since we're iterating the command here until the end of the excess spaces
-            if (isOperator(input[i])) {                    	
+            if (isOperator(input[i])) {  
+				
+				if (user_command.size() > 1 && user_command.back() == "=" && placeholder == "") {
+					if (input[i] == '-' && isdigit(input[i+1])) {
+						;
+					} 
+					else {
+						cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
+						user_command.clear();
+	               	 	return user_command;
+					}
+				}
+				                  	
 				if (containsNoChar(placeholder)) {
 					if (placeholder != "") {
 						//brute force error checking for the syntax
@@ -322,11 +338,14 @@ vector<string> processInput(string input) {
 		                	return user_command;
 						}   
 					}
-					if ((input[i] == '-' && !isdigit(input[i+1])  && isOperator(user_command.back()[user_command.back().size()-1]))) {
-						cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
-						user_command.clear();
-	                	return user_command;
-					}
+					
+					if (user_command.size() > 0) {
+						if ((input[i] == '-' && !isdigit(input[i+1])  && isOperator(user_command.back()[user_command.back().size()-1]))) {
+							cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
+							user_command.clear();
+		                	return user_command;
+						}
+					} 
 					placeholder += input[i];
                 }
 				 
@@ -400,7 +419,7 @@ vector<string> processInput(string input) {
 				}
 			}
 
-            else if (input[i] == '=') {                                                                  
+            else if (input[i] == '=') {                                                                 
 				if (placeholder != "") {  
 					if (characterError == true) {
 						cout << "SNOL> Unknown word [" << placeholder <<"]" << endl; 
@@ -756,12 +775,24 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 	for (i = 0; i < user_command.size(); i++) {								
 		input = user_command.at(i); 									
 		
-		//Removing parentheses on the user-input since we're only concerned about the data type checking on this function
-		for (int j = 0; j < 2; j++) {									
-			input.erase(remove(input.begin(), input.end(), toRemove[j]), input.end()); 		
+//		//Removing parentheses on the user-input since we're only concerned about the data type checking on this function
+//		for (int j = 0; j < 2; j++) {									
+//			input.erase(remove(input.begin(), input.end(), toRemove[j]), input.end()); 		
+//		}
+		for (int j = 0; j < input.size(); j++) {
+			if (isalnum(input[j]) || isOperator(input[j]) || input[j] == '=' || input[j]== '.') {
+				bin += input[j];
+			}
+			else if (input[j] == '(' && input[j-1] != '*') {
+				if (bin != "") {										
+					stripedInput.push_back(bin);												//stores the cleaned input to the vector stripedInput
+					bin = "";
+				}
+			}
 		}
-		if (input != "") {										
-			stripedInput.push_back(input);												//stores the cleaned input to the vector stripedInput
+		if (bin != "") {										
+			stripedInput.push_back(bin);												//stores the cleaned input to the vector stripedInput
+			bin = "";
 		}
 	}
 	//===============================================//
