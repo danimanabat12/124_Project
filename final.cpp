@@ -27,7 +27,6 @@
 #include<cmath>
 #include<cstdlib>
 #include<string>
-
 using namespace std; 
 
 //typedef struct for the masterlist of variables
@@ -181,8 +180,13 @@ vector<string> processInput(string input) {
 
         if (isalnum(input[i]) || input[i] == '.') {                                                   		//checks if the current character is alphanumeric or a dot
             if (isOperator(placeholder[placeholder.size()-1])) {                                        	//if yes, it firstly checks if the last character on the placeholder string is an operator   
-                if(isdigit(input[i]) ) {                              										 //if the upper if-statement is evaluated, it checks if the current char is a digi
-                    placeholder += input[i];                                                              	//if the condition is met, it concatenates the digit to the placeholder string
+				if(isdigit(input[i]) ) {                              										 //if the upper if-statement is evaluated, it checks if the current char is a digi
+					if(input[i-1] == ' ' && isValid(user_command.back()) && placeholder.at(placeholder.size()-1) == '-') {
+                    	cout << "Unknown command! Does not match any valid command of the language." << endl; 
+						user_command.clear();
+                		return user_command;
+					}
+					placeholder += input[i];                                                              	//if the condition is met, it concatenates the digit to the placeholder string
                 }
                 else {																						//else, if the current character is not a digit
 					if (characterError == true) {															//check first if characterError has been set to true. If yes,
@@ -225,7 +229,7 @@ vector<string> processInput(string input) {
 		}
 	
         else if (isOperator(input[i])) {                                                             		//checks if the current character is an operator
-			if (containsNoChar(placeholder)) {                                                          	//if yes, we check if the placeholder string contains no character
+			if (containsNoChar(placeholder)) {                                                          	//if yes, we check if the placeholder string contains no character 
 				if (placeholder != "") {
 					//error checking if statement which evaluates the syntax of the input. Brute force to avoid any complications
 					if ((input[i] != '-' || (input[i] == '-' && !isdigit(input[i+1]))) && placeholder.size()>1 && isOperator(placeholder[placeholder.size()-1])) {  
@@ -239,23 +243,29 @@ vector<string> processInput(string input) {
 		                return user_command;
 					}
 				}
-				if ((input[i] == '-' && !isdigit(input[i+1])  && isOperator(user_command.back()[user_command.back().size()-1]))) {
-					cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
-					user_command.clear();
-	                return user_command;
-				}
+//				if ((input[i] == '-' && !isdigit(input[i+1])  && isOperator(user_command.back()[user_command.back().size()-1]))) {
+//					cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
+//					user_command.clear();
+//	                return user_command;
+//				}
                 placeholder += input[i];                                                                 	//if it doesn't contains any character, we concatenate the current input to the placeholder string
 		    }                                                                                               
             else {                                                                                     		//else,
                 if (placeholder != "") {                                                                 		//we check if the placeholder string is not empty
-                    if (characterError == true) {																//check if characterError is set to true
+					if (characterError == true) {																//check if characterError is set to true
 						cout << "SNOL> Unknown word [" << placeholder <<"]" << endl; 
                     	user_command.clear();
                     	return user_command;
 					}
-					user_command.push_back(placeholder);                                                 	//Push the placeholder to the user_command vector
-                    user_command.push_back(string(1, input[i]));                                         	//furthermore, we add the current operator to the user_command vector
-                    placeholder = "";                                                                    	//reset placeholder
+					if (isdigit(input[i+1]) && input[i] == '-' && isValid(placeholder) && input[i-1] == ' ') {
+						cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
+						user_command.clear();
+	                	return user_command;
+					}
+                    user_command.push_back(placeholder); 
+//                        user_command.push_back(string(1, input[i])); 
+//                        placeholder = "";
+					placeholder = input[i];                                                                    	//reset placeholder
                 }
             }
             encounteredOperator = true;
@@ -292,7 +302,7 @@ vector<string> processInput(string input) {
 					if (placeholder != "") {
 						//brute force error checking for the syntax
 	                    if (!isOperator(placeholder[placeholder.size()-1]) && input[i] == '-' && isdigit(input[i+1])) { 
-							cout << "SNOL> hatdog Unknown command! Does not match any valid command of the language." << endl;
+							cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl;
 	                    	user_command.clear();
 	                    	return user_command;	
 						}
@@ -321,18 +331,22 @@ vector<string> processInput(string input) {
                 }
 				 
                 else {
+                	//need og processing input 
                     if (placeholder != "") {
                     	if (characterError == true) {
 							cout << "SNOL> Unknown word [" << placeholder <<"]" << endl; 
                     		user_command.clear();
                     		return user_command;
 						}
+						if (isdigit(input[i+1]) && input[i] == '-' && isValid(placeholder)) {
+							cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
+							user_command.clear();
+	                		return user_command;
+						}
                         user_command.push_back(placeholder); 
-                        user_command.push_back(string(1, input[i])); 
-                        placeholder = ""; 
+						placeholder = input[i]; 
                     }
                 }
-                
                 encounteredOperator = true;
             }
             
@@ -353,7 +367,12 @@ vector<string> processInput(string input) {
                 	user_command.clear();
                     return user_command;
 				}
-				placeholder += input[i];
+//				if(isdigit(input[i]) && isValid(user_command.back()) && placeholder.at(placeholder.size()-1) == '-') {
+//                    	cout << "SNOL> cdUnknown command! Does not match any valid command of the language." << endl; 
+//						user_command.clear();
+//                		return user_command;
+//				}
+				placeholder += input[i]; 
             }  
 
             else if (input[i] == '(' || input[i] == ')') { 
@@ -476,6 +495,7 @@ vector<string> processInput(string input) {
 		user_command.clear(); 
     	return user_command;
 	}
+	
     
     for (int i = 0; i < user_command.size(); i++) {
     	if (isKeyword(user_command.at(i)) && i > 0) {
@@ -488,7 +508,21 @@ vector<string> processInput(string input) {
 			user_command.clear();
 			return user_command; 
 		}
+		if (i == user_command.size() - 1) {
+			string temp = user_command.at(i);
+			if(isOperator(temp[temp.size()-1]) || temp[temp.size()-1] == '=') {
+			cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl; 
+    		user_command.clear(); 
+    		return user_command;
+			}
+		}
 	}
+//	
+//	cout << "debug: " << endl; 
+//	for (i = 0; i < user_command.size(); i++) {
+//		cout << "TOKEN: " << user_command.at(i) << endl;
+//	} 
+//	
 	
 	//returns the error-checked user_command vector to the calling function. 
     return user_command;
@@ -732,6 +766,10 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 	}
 	//===============================================//
 	
+//	for (int i = 0; i < stripedInput.size(); i++) {
+//		cout << "INPUT: " << stripedInput.at(i) << endl; 
+//	}
+	
 	//checks if the vector of cleaned input only contains one element
 	if (stripedInput.size() == 1) { 								
 		//If yes, it will check if the the element is a valid variable name and if it is not yet used. If yes, it will display an error	
@@ -757,12 +795,15 @@ bool processElements(vector<string> user_command, vector<variables> &var_list) {
 		//These two if-statement checks if the input contains a variable or a literal not being used for an operation
 		//Example: var1 = var2 var3*4. This is an invalid syntax. 
 
-		if (stripedInput.size() > 3 && input.size() == 1 && i > 1 && !isOperator(stripedInput.at(i)[0]) && !isOperator(stripedInput.at(i-1)[0])) {
-			cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl;
-			return false; 
-		}
+//		if (stripedInput.size() > 3 && input.size() == 1 && i > 1 && !isOperator(stripedInput.at(i)[0]) && !isOperator(stripedInput.at(i-1)[0])) {
+//			cout << "ANYWAYS..." << endl; 
+//			cout <<  stripedInput.at(i)[0] << endl; 
+//			cout << stripedInput.at(i-1)[0] << endl; 
+//			cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl;
+//			return false; 
+//		}
 		
-		if (stripedInput.size() > 2 && isValid(input) && i > 1 && (!isOperator(stripedInput.at(i-1)[0]) && stripedInput.at(i-1) != "=")) {
+		if (stripedInput.size() > 2 && isValid(input) && i > 1 && (!isOperator(stripedInput.at(i-1)[stripedInput.at(i-1).size()-1]) && stripedInput.at(i-1) != "=")) {
 			cout << "SNOL> Unknown command! Does not match any valid command of the language." << endl;
 			return false; 
 		}
